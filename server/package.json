@@ -4,15 +4,35 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "create-dev-tables": "babel-node ./db/dev/dbConnection createAllTables",
+    "start": "nodemon --watch . --exec babel-node -- server",
+    "setup": "npm-run-all -p start create-dev-tables"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/polyfill": "^7.8.7",
+    "babel-node": "0.0.1-security",
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^5.0.0-alpha.6",
+    "jsonwebtoken": "^8.5.1",
+    "make-runnable": "^1.3.6",
+    "moment": "^2.24.0",
     "morgan": "^1.9.1",
     "nodemon": "^2.0.2",
-    "path": "^0.12.7"
+    "npm-run-all": "^4.1.5",
+    "path": "^0.12.7",
+    "pg": "^8.0.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^7.0.0-alpha.12",
+    "babel-core": "^7.0.0-bridge.0",
+    "babel-preset-env": "^2.0.0-alpha.6",
+    "babel-preset-es2015": "^7.0.0-alpha.19",
+    "babel-register": "^7.0.0-alpha.2",
+    "babel-watch": "^7.0.0"
   }
 }

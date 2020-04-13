@@ -1,6 +1,8 @@
-var express = require("express");
-const bodyParser = require("body-parser");
-var logger = require("morgan");
+import express from "express";
+import "babel-polyfill";
+import cors from "cors";
+import usersRoute from "./routes/usersRoute";
+import seedRoute from "./routes/seedRoute";
 
 const app = express();
 
@@ -18,13 +20,8 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.use(bodyParser.json());
-app.use(logger("dev"));
-
-app.post('/api/users/authenticate', (req, res) => {
-  console.log("\najunge in authenticate", req.body.username, req.body.password)
-  res.send({ "username": req.body.username, "token": "123" });
-});
+app.use("/api", usersRoute);
+app.use("/api", seedRoute);
 
 app.use((err, req, res, next) => {
   console.warn(err);
