@@ -1,12 +1,7 @@
 import pool from "../db/dev/pool";
 import { hashPassword } from "../helpers/validations";
 import { status } from "../helpers/status";
-/**
- * Create A User
- * @param {object} req
- * @param {object} res
- * @returns {object} reflection object
- */
+
 const seedUser = async (req, res) => {
   const seedUserQuery = `INSERT INTO
   users VALUES

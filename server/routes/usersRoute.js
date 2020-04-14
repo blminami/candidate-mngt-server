@@ -8,6 +8,6 @@ const router = express.Router();
 
 // router.post("/auth/signup", createUser);
 // router.post("/auth/signin", siginUser);
-router.get("/users/first_name", searchFirstnameOrLastname);
+router.get("/first_name", searchFirstnameOrLastname);
 
 export default router;

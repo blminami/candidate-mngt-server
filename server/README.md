@@ -17,3 +17,19 @@
 **app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });** -> to be inserted after all routes
+
+
+npm run setup
+
+
+TODO:
+filtru
+
+1. nume
+2. skills
+3. yearsOfExperience
+4. search for key words in -> about, experience, skills, education,
+certifications
+
+
+SELECT id, email FROM candidates WHERE to_tsvector(certifications) @@ to_tsquery('french & language');
