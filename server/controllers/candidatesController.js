@@ -8,13 +8,34 @@ const removeLastWord = (text) => {
 };
 
 const getAll = async (req, res) => {
-  const getAllQuery =
-    "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image from candidates";
+  const { limit, offset } = req.query;
+  const getAllQuery = `SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates
+     LIMIT $1 OFFSET $2;`;
   try {
-    const { rows } = await dbQuery.query(getAllQuery);
+    const { rows } = await dbQuery.query(getAllQuery, [limit, offset]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = "No candidates found!";
+      return res.status(status.notfound).send(errorMessage);
+    }
+    successMessage.data = dbResponse;
+    return res.status(status.success).send(successMessage);
+  } catch (error) {
+    errorMessage.error = "Operation was not successful";
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+const getByID = async (req, res) => {
+  console.log("ajunge aici");
+  const { id } = req.params;
+  const getByIdQuery =
+    "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE id = $1;";
+  try {
+    const { rows } = await dbQuery.query(getByIdQuery, [id]);
+    const dbResponse = rows;
+    if (!dbResponse[0]) {
+      errorMessage.error = "No candidate found!";
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
@@ -60,7 +81,6 @@ const addCandidate = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log("error: ", error);
     errorMessage.error = "Unable to add candidate";
     return res.status(status.error).send(errorMessage);
   }
@@ -71,7 +91,7 @@ const searchCandidates = async (req, res) => {
   let newSkills = skills
     .split(",")
     .map((el) => {
-      return "'" + el + "'";
+      return "'" + el.toLowerCase() + "'";
     })
     .join(",");
   let searchQuery =
@@ -108,10 +128,9 @@ const searchCandidates = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    console.log("error: ", error);
     errorMessage.error = "Operation was not successful";
     return res.status(status.error).send(errorMessage);
   }
 };
 
-export { getAll, addCandidate, searchCandidates };
+export { getAll, getByID, searchCandidates, addCandidate };

@@ -1,10 +1,10 @@
 import pool from "./pool";
 
 export default {
-  query(quertText, params) {
+  query(queryText, params) {
     return new Promise((resolve, reject) => {
       pool
-        .query(quertText, params)
+        .query(queryText, params)
         .then((res) => {
           resolve(res);
         })
