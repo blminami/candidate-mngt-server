@@ -1,18 +1,13 @@
 import dbQuery from "../db/dev/dbQuery";
 import { errorMessage, successMessage, status } from "../helpers/status";
-
-const removeLastWord = (text) => {
-  let newText = text.split(" ");
-  newText.pop();
-  return newText.join(" ");
-};
+import { removeLastWord } from "../helpers/utils";
 
 const getAll = async (req, res) => {
-  const { limit, offset } = req.query;
+  const { userId, limit, offset } = req.query;
   const getAllQuery = `SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates
-     LIMIT $1 OFFSET $2;`;
+    WHERE user_id = $1 LIMIT $2 OFFSET $3;`;
   try {
-    const { rows } = await dbQuery.query(getAllQuery, [limit, offset]);
+    const { rows } = await dbQuery.query(getAllQuery, [userId, limit, offset]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = "No candidates found!";
@@ -27,7 +22,6 @@ const getAll = async (req, res) => {
 };
 
 const getByID = async (req, res) => {
-  console.log("ajunge aici");
   const { id } = req.params;
   const getByIdQuery =
     "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE id = $1;";
@@ -48,6 +42,7 @@ const getByID = async (req, res) => {
 
 const addCandidate = async (req, res) => {
   const {
+    user_id,
     email,
     name,
     about,
@@ -62,8 +57,8 @@ const addCandidate = async (req, res) => {
 
   const insertCandidateQuery = `INSERT INTO
     candidates(id, email, name, about, about_tokens, experience, experience_tokens,
-        years_of_experience, skills, education, education_tokens, certifications, certifications_tokens)
-    VALUES(default, $1, $2, $3, to_tsvector($3), $4, to_tsvector($4), $5, $6, $7, to_tsvector($7), $8, to_tsvector($8))
+        years_of_experience, skills, education, education_tokens, certifications, certifications_tokens, user_id)
+    VALUES(default, $1, $2, $3, to_tsvector($3), $4, to_tsvector($4), $5, $6, $7, to_tsvector($7), $8, to_tsvector($8), $9)
     returning *`;
   const values = [
     email,
@@ -74,6 +69,7 @@ const addCandidate = async (req, res) => {
     skillData,
     education,
     certifications,
+    user_id,
   ];
   try {
     const { rows } = await dbQuery.query(insertCandidateQuery, values);
@@ -87,7 +83,14 @@ const addCandidate = async (req, res) => {
 };
 
 const searchCandidates = async (req, res) => {
-  const { name, skills, yearsOfExperience, keyWords, sections } = req.query;
+  const {
+    userId,
+    name,
+    skills,
+    yearsOfExperience,
+    keyWords,
+    sections,
+  } = req.query;
   let newSkills = skills
     .split(",")
     .map((el) => {
@@ -95,7 +98,7 @@ const searchCandidates = async (req, res) => {
     })
     .join(",");
   let searchQuery =
-    "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE";
+    "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE user_id = $1 AND";
   if (name) {
     searchQuery += " name LIKE '%" + name + "%' AND";
   }
@@ -119,7 +122,7 @@ const searchCandidates = async (req, res) => {
   }
   searchQuery = removeLastWord(searchQuery) + ";";
   try {
-    const { rows } = await dbQuery.query(searchQuery);
+    const { rows } = await dbQuery.query(searchQuery, [userId]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = "No candidates found!";

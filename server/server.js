@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import usersRoute from "./routes/usersRoute";
 import seedRoute from "./routes/seedRoute";
 import candidatesRoute from "./routes/candidatesRoute";
+import interviewsRoute from "./routes/interviewsRoute";
 
 const app = express();
 
@@ -28,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/api", seedRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/candidates", candidatesRoute);
+app.use("/api/interviews", interviewsRoute);
 
 app.use((err, req, res, next) => {
   console.warn(err);

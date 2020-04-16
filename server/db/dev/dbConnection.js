@@ -50,6 +50,7 @@ const createCandidatesTable = () => {
       certifications TEXT,
       certifications_tokens TSVECTOR,
       profile_image VARCHAR(1000),
+      user_id INTEGER,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 
@@ -61,6 +62,46 @@ const createCandidatesTable = () => {
 
   pool
     .query(candidatesCreateQuery)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
+const createInterviewsTable = () => {
+  const interviewsCreateQuery = `
+    CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = NOW();
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TABLE IF NOT EXISTS interviews
+      (id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      candidate_id INTEGER,
+      title VARCHAR(200),
+      notes VARCHAR(500),
+      status TEXT ARRAY,
+      tags TEXT ARRAY,
+      start_date TIMESTAMPTZ NOT NULL,
+      due_date TIMESTAMPTZ NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+
+    CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON interviews
+    FOR EACH ROW
+    EXECUTE PROCEDURE trigger_set_timestamp();
+  `;
+  pool
+    .query(interviewsCreateQuery)
     .then((res) => {
       console.log(res);
       pool.end();
@@ -86,9 +127,23 @@ const dropUserTable = () => {
 };
 
 const dropCandidatesTable = () => {
-  const usersDropQuery = "DROP TABLE IF EXISTS candidates;";
+  const candidatesDropQuery = "DROP TABLE IF EXISTS candidates;";
   pool
-    .query(usersDropQuery)
+    .query(candidatesDropQuery)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
+const dropInterviewsTable = () => {
+  const interviewsDropQuery = "DROP TABLE IF EXISTS interviews;";
+  pool
+    .query(interviewsDropQuery)
     .then((res) => {
       console.log(res);
       pool.end();
@@ -105,11 +160,13 @@ const dropCandidatesTable = () => {
 const createAllTables = () => {
   createUserTable();
   createCandidatesTable();
+  createInterviewsTable();
 };
 
 const dropAllTables = () => {
   dropUserTable();
   dropCandidatesTable();
+  dropInterviewsTable();
 };
 
 pool.on("remove", () => {

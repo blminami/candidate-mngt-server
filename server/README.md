@@ -29,3 +29,8 @@ filtru - search by:
 4. search for key words in -> about, experience, skills, education, certifications
 
 SELECT id, email FROM candidates WHERE to_tsvector(certifications) @@ to_tsquery('french & language');
+
+
+
+INTERVIEWS:
+getAllBy: user_id, limit, offset: mandatory // title, status, tags, date // optional
