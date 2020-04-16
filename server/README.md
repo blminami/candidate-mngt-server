@@ -8,28 +8,24 @@
 
 **models** - This is where we will keep all files that are responsible for interfacing with our database.
 
-*api/route-name* -> all routes prefixed with `api`
+_api/route-name_ -> all routes prefixed with `api`
 
 ## Client - server configuration
 
 `app.use(express.static(path.join(__dirname, '../client/dist')));`
 
-**app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+**app.get('\*', (req, res) => {
+res.sendFile(path.join(\_\_dirname, '../client/dist/index.html'));
 });** -> to be inserted after all routes
-
 
 npm run setup
 
-
 TODO:
-filtru
+filtru - search by:
 
 1. nume
 2. skills
 3. yearsOfExperience
-4. search for key words in -> about, experience, skills, education,
-certifications
-
+4. search for key words in -> about, experience, skills, education, certifications
 
 SELECT id, email FROM candidates WHERE to_tsvector(certifications) @@ to_tsquery('french & language');
