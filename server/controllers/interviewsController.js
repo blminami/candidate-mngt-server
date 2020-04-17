@@ -12,6 +12,7 @@ const addInterview = async (req, res) => {
     tags,
     start_date,
     due_date,
+    job_id,
   } = req.body;
 
   let statusData = "{}";
@@ -24,8 +25,8 @@ const addInterview = async (req, res) => {
   }
 
   const insertInterviewQuery = `INSERT INTO
-      interviews(id, user_id, candidate_id, title, notes, status, tags, start_date, due_date)
-      VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8)
+      interviews(id, user_id, candidate_id, title, notes, status, tags, start_date, due_date, job_id)
+      VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8, $9)
       returning *`;
   const values = [
     user_id,
@@ -36,6 +37,7 @@ const addInterview = async (req, res) => {
     tagsData,
     start_date,
     due_date,
+    job_id,
   ];
   try {
     const { rows } = await dbQuery.query(insertInterviewQuery, values);

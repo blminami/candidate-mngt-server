@@ -86,6 +86,7 @@ const createInterviewsTable = () => {
       (id SERIAL PRIMARY KEY,
       user_id INTEGER,
       candidate_id INTEGER,
+      job_id INTEGER,
       title VARCHAR(200),
       notes VARCHAR(500),
       status TEXT ARRAY,
@@ -102,6 +103,43 @@ const createInterviewsTable = () => {
   `;
   pool
     .query(interviewsCreateQuery)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
+const createJobsTable = () => {
+  const jobsCreateQuery = `
+    CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = NOW();
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TABLE IF NOT EXISTS jobs
+      (id SERIAL PRIMARY KEY,
+      title VARCHAR(200),
+      description VARCHAR(500),
+      status TEXT ARRAY,
+      required_resources INTEGER,
+      hired_resources INTEGER,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+
+    CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON jobs
+    FOR EACH ROW
+    EXECUTE PROCEDURE trigger_set_timestamp();
+  `;
+  pool
+    .query(jobsCreateQuery)
     .then((res) => {
       console.log(res);
       pool.end();
@@ -154,6 +192,20 @@ const dropInterviewsTable = () => {
     });
 };
 
+const dropJobsTable = () => {
+  const jobsDropQuery = "DROP TABLE IF EXISTS jobs;";
+  pool
+    .query(jobsDropQuery)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 /**
  * Create All Tables
  */
@@ -161,12 +213,14 @@ const createAllTables = () => {
   createUserTable();
   createCandidatesTable();
   createInterviewsTable();
+  createJobsTable();
 };
 
 const dropAllTables = () => {
   dropUserTable();
   dropCandidatesTable();
   dropInterviewsTable();
+  dropJobsTable();
 };
 
 pool.on("remove", () => {
