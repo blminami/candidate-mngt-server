@@ -1,11 +1,12 @@
 import express from "express";
 import "babel-polyfill";
-import cors from "cors";
 import bodyParser from "body-parser";
+
 import usersRoute from "./routes/usersRoute";
 import seedRoute from "./routes/seedRoute";
 import candidatesRoute from "./routes/candidatesRoute";
 import interviewsRoute from "./routes/interviewsRoute";
+import jobsRoute from "./routes/jobsRoute";
 
 const app = express();
 
@@ -30,6 +31,7 @@ app.use("/api", seedRoute);
 app.use("/api/users", usersRoute);
 app.use("/api/candidates", candidatesRoute);
 app.use("/api/interviews", interviewsRoute);
+app.use("/api/jobs", jobsRoute);
 
 app.use((err, req, res, next) => {
   console.warn(err);

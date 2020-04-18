@@ -125,9 +125,10 @@ const createJobsTable = () => {
 
     CREATE TABLE IF NOT EXISTS jobs
       (id SERIAL PRIMARY KEY,
+      user_id INTEGER,
       title VARCHAR(200),
       description VARCHAR(500),
-      status TEXT ARRAY,
+      status VARCHAR(100),
       required_resources INTEGER,
       hired_resources INTEGER,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -141,7 +142,6 @@ const createJobsTable = () => {
   pool
     .query(jobsCreateQuery)
     .then((res) => {
-      console.log(res);
       pool.end();
     })
     .catch((err) => {
