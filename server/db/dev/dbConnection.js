@@ -1,7 +1,7 @@
-import pool from "./pool";
+import pool from './pool';
 
-pool.on("connect", () => {
-  console.log("connected to the db");
+pool.on('connect', () => {
+  console.log('connected to the db');
 });
 
 const createUserTable = () => {
@@ -151,7 +151,7 @@ const createJobsTable = () => {
 };
 
 const dropUserTable = () => {
-  const usersDropQuery = "DROP TABLE IF EXISTS users;";
+  const usersDropQuery = 'DROP TABLE IF EXISTS users;';
   pool
     .query(usersDropQuery)
     .then((res) => {
@@ -165,7 +165,7 @@ const dropUserTable = () => {
 };
 
 const dropCandidatesTable = () => {
-  const candidatesDropQuery = "DROP TABLE IF EXISTS candidates;";
+  const candidatesDropQuery = 'DROP TABLE IF EXISTS candidates;';
   pool
     .query(candidatesDropQuery)
     .then((res) => {
@@ -179,7 +179,7 @@ const dropCandidatesTable = () => {
 };
 
 const dropInterviewsTable = () => {
-  const interviewsDropQuery = "DROP TABLE IF EXISTS interviews;";
+  const interviewsDropQuery = 'DROP TABLE IF EXISTS interviews;';
   pool
     .query(interviewsDropQuery)
     .then((res) => {
@@ -193,7 +193,7 @@ const dropInterviewsTable = () => {
 };
 
 const dropJobsTable = () => {
-  const jobsDropQuery = "DROP TABLE IF EXISTS jobs;";
+  const jobsDropQuery = 'DROP TABLE IF EXISTS jobs;';
   pool
     .query(jobsDropQuery)
     .then((res) => {
@@ -223,11 +223,11 @@ const dropAllTables = () => {
   dropJobsTable();
 };
 
-pool.on("remove", () => {
-  console.log("client removed");
+pool.on('remove', () => {
+  console.log('client removed');
   process.exit(0);
 });
 
 export { createAllTables, dropAllTables };
 
-require("make-runnable");
+require('make-runnable');

@@ -1,6 +1,6 @@
-import dbQuery from "../db/dev/dbQuery";
-import { errorMessage, successMessage, status } from "../helpers/status";
-import { removeLastWord } from "../helpers/utils";
+import dbQuery from '../db/dev/dbQuery';
+import { errorMessage, successMessage, status } from '../helpers/status';
+import { removeLastWord } from '../helpers/utils';
 
 const addInterview = async (req, res) => {
   const {
@@ -15,13 +15,13 @@ const addInterview = async (req, res) => {
     job_id,
   } = req.body;
 
-  let statusData = "{}";
-  let tagsData = "{}";
+  let statusData = '{}';
+  let tagsData = '{}';
   if (interview_status) {
-    statusData = "{" + interview_status.toLowerCase() + "}";
+    statusData = '{' + interview_status.toLowerCase() + '}';
   }
   if (tags) {
-    tagsData = "{" + tags.toLowerCase() + "}";
+    tagsData = '{' + tags.toLowerCase() + '}';
   }
 
   const insertInterviewQuery = `INSERT INTO
@@ -45,8 +45,8 @@ const addInterview = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log("error", error);
-    errorMessage.error = "Unable to add interview";
+    console.log('error', error);
+    errorMessage.error = 'Unable to add interview';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -68,40 +68,40 @@ const getAll = async (req, res) => {
   }
   if (interview_status) {
     let newStatus = interview_status
-      .split(",")
+      .split(',')
       .map((el) => {
         return "'" + el.toLowerCase() + "'";
       })
-      .join(",");
-    getAllQuery += " status @> ARRAY[" + newStatus + "::text] AND";
+      .join(',');
+    getAllQuery += ' status @> ARRAY[' + newStatus + '::text] AND';
   }
   if (tags) {
     let newTags = tags
-      .split(",")
+      .split(',')
       .map((el) => {
         return "'" + el.toLowerCase() + "'";
       })
-      .join(",");
-    getAllQuery += " tags @> ARRAY[" + newTags + "::text] AND";
+      .join(',');
+    getAllQuery += ' tags @> ARRAY[' + newTags + '::text] AND';
   }
   if (by_date) {
-    getAllQuery += " DATE(start_date) = CURRENT_DATE AND";
+    getAllQuery += ' DATE(start_date) = CURRENT_DATE AND';
   }
-  getAllQuery = removeLastWord(getAllQuery) + " LIMIT $2 OFFSET $3;";
+  getAllQuery = removeLastWord(getAllQuery) + ' LIMIT $2 OFFSET $3;';
 
-  console.log("getALlQuery: ", getAllQuery);
+  console.log('getALlQuery: ', getAllQuery);
   try {
     const { rows } = await dbQuery.query(getAllQuery, [user_id, limit, offset]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
-      errorMessage.error = "No interviews found!";
+      errorMessage.error = 'No interviews found!';
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
     console.log(error);
-    errorMessage.error = "Operation was not successful";
+    errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -117,13 +117,13 @@ const updateInterview = async (req, res) => {
     due_date,
   } = req.body;
 
-  let statusData = "{}";
-  let tagsData = "{}";
+  let statusData = '{}';
+  let tagsData = '{}';
   if (interview_status) {
-    statusData = "{" + interview_status.toLowerCase() + "}";
+    statusData = '{' + interview_status.toLowerCase() + '}';
   }
   if (tags) {
-    tagsData = "{" + tags.toLowerCase() + "}";
+    tagsData = '{' + tags.toLowerCase() + '}';
   }
 
   const updateInterviewQuery = `UPDATE interviews
@@ -136,8 +136,8 @@ const updateInterview = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log("error", error);
-    errorMessage.error = "Unable to update interview";
+    console.log('error', error);
+    errorMessage.error = 'Unable to update interview';
     return res.status(status.error).send(errorMessage);
   }
 };

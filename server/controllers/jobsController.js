@@ -1,5 +1,5 @@
-import dbQuery from "../db/dev/dbQuery";
-import { errorMessage, successMessage, status } from "../helpers/status";
+import dbQuery from '../db/dev/dbQuery';
+import { errorMessage, successMessage, status } from '../helpers/status';
 
 const addJob = async (req, res) => {
   const {
@@ -29,8 +29,8 @@ const addJob = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log("error", error);
-    errorMessage.error = "Unable to add job";
+    console.log('error', error);
+    errorMessage.error = 'Unable to add job';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -42,32 +42,32 @@ const getAll = async (req, res) => {
     const { rows } = await dbQuery.query(getAllQuery, [user_id]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
-      errorMessage.error = "No jobs found!";
+      errorMessage.error = 'No jobs found!';
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
     console.log(error);
-    errorMessage.error = "Operation was not successful";
+    errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
 };
 
 const getByID = async (req, res) => {
   const { id } = req.params;
-  const getByIdQuery = "SELECT * FROM jobs WHERE id = $1;";
+  const getByIdQuery = 'SELECT * FROM jobs WHERE id = $1;';
   try {
     const { rows } = await dbQuery.query(getByIdQuery, [id]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
-      errorMessage.error = "No job found!";
+      errorMessage.error = 'No job found!';
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    errorMessage.error = "Operation was not successful";
+    errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -99,8 +99,8 @@ const updateJob = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log("error", error);
-    errorMessage.error = "Unable to update job";
+    console.log('error', error);
+    errorMessage.error = 'Unable to update job';
     return res.status(status.error).send(errorMessage);
   }
 };

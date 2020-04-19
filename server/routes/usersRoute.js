@@ -1,6 +1,6 @@
-import express from "express";
+import express from 'express';
 
-import { searchFirstnameOrLastname } from "../controllers/usersController";
+import { searchFirstnameOrLastname } from '../controllers/usersController';
 
 const router = express.Router();
 
@@ -8,6 +8,6 @@ const router = express.Router();
 
 // router.post("/auth/signup", createUser);
 // router.post("/auth/signin", siginUser);
-router.get("/first_name", searchFirstnameOrLastname);
+router.get('/first_name', searchFirstnameOrLastname);
 
 export default router;

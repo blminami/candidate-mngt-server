@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import env from "../env";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import env from '../env';
 /**
  * Hash Password Method
  * @param {string} password
@@ -37,7 +37,7 @@ const isValidEmail = (email) => {
  * @returns {Boolean} True or False
  */
 const validatePassword = (password) => {
-  if (password.length <= 5 || password === "") {
+  if (password.length <= 5 || password === '') {
     return false;
   }
   return true;
@@ -48,10 +48,10 @@ const validatePassword = (password) => {
  * @returns {Boolean} True or False
  */
 const isEmpty = (input) => {
-  if (input === undefined || input === "") {
+  if (input === undefined || input === '') {
     return true;
   }
-  if (input.replace(/\s/g, "").length) {
+  if (input.replace(/\s/g, '').length) {
     return false;
   }
   return true;
@@ -63,7 +63,7 @@ const isEmpty = (input) => {
  * @returns {Boolean} True or False
  */
 const empty = (input) => {
-  if (input === undefined || input === "") {
+  if (input === undefined || input === '') {
     return true;
   }
 };
@@ -83,7 +83,7 @@ const generateUserToken = (email, id, is_admin, first_name, last_name) => {
       last_name,
     },
     env.secret,
-    { expiresIn: "3d" }
+    { expiresIn: '3d' }
   );
   return token;
 };

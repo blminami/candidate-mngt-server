@@ -1,22 +1,24 @@
-import dbQuery from "../db/dev/dbQuery";
-import { errorMessage, successMessage, status } from "../helpers/status";
-import { removeLastWord } from "../helpers/utils";
+import dbQuery from '../db/dev/dbQuery';
+import { errorMessage, successMessage, status } from '../helpers/status';
+import { removeLastWord } from '../helpers/utils';
 
 const getAll = async (req, res) => {
-  const { userId, limit, offset } = req.query;
+  const userId = 1;
+  const { limit, offset } = req.query;
   const getAllQuery = `SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates
     WHERE user_id = $1 LIMIT $2 OFFSET $3;`;
   try {
     const { rows } = await dbQuery.query(getAllQuery, [userId, limit, offset]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
-      errorMessage.error = "No candidates found!";
+      errorMessage.error = 'No candidates found!';
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    errorMessage.error = "Operation was not successful";
+    console.log(error);
+    errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -24,18 +26,18 @@ const getAll = async (req, res) => {
 const getByID = async (req, res) => {
   const { id } = req.params;
   const getByIdQuery =
-    "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE id = $1;";
+    'SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE id = $1;';
   try {
     const { rows } = await dbQuery.query(getByIdQuery, [id]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
-      errorMessage.error = "No candidate found!";
+      errorMessage.error = 'No candidate found!';
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    errorMessage.error = "Operation was not successful";
+    errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -53,7 +55,7 @@ const addCandidate = async (req, res) => {
     certifications,
   } = req.body;
 
-  const skillData = "{" + skills.toLowerCase() + "}";
+  const skillData = '{' + skills.toLowerCase() + '}';
 
   const insertCandidateQuery = `INSERT INTO
     candidates(id, email, name, about, about_tokens, experience, experience_tokens,
@@ -77,7 +79,7 @@ const addCandidate = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    errorMessage.error = "Unable to add candidate";
+    errorMessage.error = 'Unable to add candidate';
     return res.status(status.error).send(errorMessage);
   }
 };
@@ -92,48 +94,66 @@ const searchCandidates = async (req, res) => {
     sections,
   } = req.query;
   let newSkills = skills
-    .split(",")
+    .split(',')
     .map((el) => {
       return "'" + el.toLowerCase() + "'";
     })
-    .join(",");
+    .join(',');
   let searchQuery =
-    "SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE user_id = $1 AND";
+    'SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE user_id = $1 AND';
   if (name) {
     searchQuery += " name LIKE '%" + name + "%' AND";
   }
   if (skills) {
-    searchQuery += " skills @> ARRAY[" + newSkills + "::text] AND";
+    searchQuery += ' skills @> ARRAY[' + newSkills + '::text] AND';
   }
   if (yearsOfExperience) {
-    searchQuery += " years_of_experience = " + yearsOfExperience + " AND";
+    searchQuery += ' years_of_experience = ' + yearsOfExperience + ' AND';
   }
   if (keyWords) {
-    searchQuery += " (";
-    const keyWordsArray = keyWords.split(",").map((el) => el.replace(" ", "&"));
-    const sectionsArray = sections.split(",").map((el) => el.toLowerCase());
+    searchQuery += ' (';
+    const keyWordsArray = keyWords.split(',').map((el) => el.replace(' ', '&'));
+    const sectionsArray = sections.split(',').map((el) => el.toLowerCase());
     keyWordsArray.forEach((keyWord) => {
       sectionsArray.forEach((section) => {
         searchQuery +=
-          " to_tsvector(" + section + ") @@ to_tsquery('" + keyWord + "') OR";
+          ' to_tsvector(' + section + ") @@ to_tsquery('" + keyWord + "') OR";
       });
     });
-    searchQuery = removeLastWord(searchQuery) + ") AND";
+    searchQuery = removeLastWord(searchQuery) + ') AND';
   }
-  searchQuery = removeLastWord(searchQuery) + ";";
+  searchQuery = removeLastWord(searchQuery) + ';';
   try {
     const { rows } = await dbQuery.query(searchQuery, [userId]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
-      errorMessage.error = "No candidates found!";
+      errorMessage.error = 'No candidates found!';
       return res.status(status.notfound).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    errorMessage.error = "Operation was not successful";
+    errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
 };
 
-export { getAll, getByID, searchCandidates, addCandidate };
+const getCandidatesLength = async (req, res) => {
+  const userId = 1;
+  const query = 'SELECT COUNT(*) FROM candidates WHERE user_id=$1;';
+  try {
+    const { rows } = await dbQuery.query(query, [userId]);
+    const dbResponse = rows;
+    if (!dbResponse[0]) {
+      errorMessage.error = 'No candidates found!';
+      return res.status(status.notfound).send(errorMessage);
+    }
+    successMessage.data = dbResponse;
+    return res.status(status.success).send(successMessage);
+  } catch (error) {
+    errorMessage.error = 'Operation was not successful';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+export { getAll, getByID, searchCandidates, addCandidate, getCandidatesLength };

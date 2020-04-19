@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-const successMessage = { status: "success" };
-const errorMessage = { status: "error" };
+const successMessage = { status: 'success' };
+const errorMessage = { status: 'error' };
 const status = {
   success: 200,
   error: 500,

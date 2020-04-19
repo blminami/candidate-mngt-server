@@ -1,7 +1,7 @@
-import pool from "../db/dev/pool";
+import pool from '../db/dev/pool';
 
-pool.on("connect", () => {
-  console.log("connected to the db");
+pool.on('connect', () => {
+  console.log('connected to the db');
 });
 
 /**
@@ -35,11 +35,11 @@ const seedUser = () => {
   seed();
 };
 
-pool.on("remove", () => {
-  console.log("client removed");
+pool.on('remove', () => {
+  console.log('client removed');
   process.exit(0);
 });
 
 export { seedUser };
 
-require("make-runnable");
+require('make-runnable');

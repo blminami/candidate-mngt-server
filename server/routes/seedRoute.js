@@ -1,9 +1,9 @@
-import express from "express";
+import express from 'express';
 
-import seedUser from "../controllers/seedUserController";
+import seedUser from '../controllers/seedUserController';
 
 const router = express.Router();
 
-router.get("/user/seed", seedUser);
+router.get('/user/seed', seedUser);
 
 export default router;

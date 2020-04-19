@@ -1,7 +1,7 @@
 const removeLastWord = (text) => {
-  let newText = text.split(" ");
+  let newText = text.split(' ');
   newText.pop();
-  return newText.join(" ");
+  return newText.join(' ');
 };
 
 export { removeLastWord };
