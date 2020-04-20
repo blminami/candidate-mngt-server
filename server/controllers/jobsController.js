@@ -1,5 +1,6 @@
 import dbQuery from '../db/dev/dbQuery';
 import { errorMessage, successMessage, status } from '../helpers/status';
+import { removeLastWord } from '../helpers/utils';
 
 const addJob = async (req, res) => {
   const {
@@ -36,8 +37,21 @@ const addJob = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const { user_id } = req.query;
-  const getAllQuery = `SELECT * FROM jobs WHERE user_id = $1;`;
+  const { user_id, project_name, project_status } = req.query;
+  let getAllQuery = `SELECT * FROM jobs WHERE user_id = $1 AND`;
+  if (project_name) {
+    getAllQuery += " title like '%" + project_name.toLowerCase() + "%' AND";
+  }
+  if (project_status) {
+    getAllQuery += ' (';
+    const statuses = project_status.split(',').map((el) => el.toUpperCase());
+    statuses.forEach((element) => {
+      getAllQuery += " status='" + element + "' OR";
+    });
+    getAllQuery = removeLastWord(getAllQuery) + ') AND';
+  }
+  getAllQuery = removeLastWord(getAllQuery) + ';';
+
   try {
     const { rows } = await dbQuery.query(getAllQuery, [user_id]);
     const dbResponse = rows;

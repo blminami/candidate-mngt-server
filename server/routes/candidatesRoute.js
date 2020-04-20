@@ -14,7 +14,6 @@ const router = express.Router();
 router.get('/', getAll);
 router.get('/id/:id', getByID);
 router.get('/pagination/length/byUser', getCandidatesLength);
-router.get('/filter', searchCandidates);
 router.post('/', addCandidate);
 
 export default router;

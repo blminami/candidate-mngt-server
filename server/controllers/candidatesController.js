@@ -2,27 +2,6 @@ import dbQuery from '../db/dev/dbQuery';
 import { errorMessage, successMessage, status } from '../helpers/status';
 import { removeLastWord } from '../helpers/utils';
 
-const getAll = async (req, res) => {
-  const userId = 1;
-  const { limit, offset } = req.query;
-  const getAllQuery = `SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates
-    WHERE user_id = $1 LIMIT $2 OFFSET $3;`;
-  try {
-    const { rows } = await dbQuery.query(getAllQuery, [userId, limit, offset]);
-    const dbResponse = rows;
-    if (!dbResponse[0]) {
-      errorMessage.error = 'No candidates found!';
-      return res.status(status.notfound).send(errorMessage);
-    }
-    successMessage.data = dbResponse;
-    return res.status(status.success).send(successMessage);
-  } catch (error) {
-    console.log(error);
-    errorMessage.error = 'Operation was not successful';
-    return res.status(status.error).send(errorMessage);
-  }
-};
-
 const getByID = async (req, res) => {
   const { id } = req.params;
   const getByIdQuery =
@@ -84,7 +63,7 @@ const addCandidate = async (req, res) => {
   }
 };
 
-const searchCandidates = async (req, res) => {
+const getAll = async (req, res) => {
   const {
     userId,
     name,
@@ -92,19 +71,22 @@ const searchCandidates = async (req, res) => {
     yearsOfExperience,
     keyWords,
     sections,
+    limit,
+    offset,
   } = req.query;
-  let newSkills = skills
-    .split(',')
-    .map((el) => {
-      return "'" + el.toLowerCase() + "'";
-    })
-    .join(',');
+
   let searchQuery =
     'SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE user_id = $1 AND';
   if (name) {
     searchQuery += " name LIKE '%" + name + "%' AND";
   }
   if (skills) {
+    let newSkills = skills
+      .split(',')
+      .map((el) => {
+        return "'" + el.toLowerCase() + "'";
+      })
+      .join(',');
     searchQuery += ' skills @> ARRAY[' + newSkills + '::text] AND';
   }
   if (yearsOfExperience) {
@@ -122,9 +104,9 @@ const searchCandidates = async (req, res) => {
     });
     searchQuery = removeLastWord(searchQuery) + ') AND';
   }
-  searchQuery = removeLastWord(searchQuery) + ';';
+  searchQuery = removeLastWord(searchQuery) + 'LIMIT $2 OFFSET $3;';
   try {
-    const { rows } = await dbQuery.query(searchQuery, [userId]);
+    const { rows } = await dbQuery.query(searchQuery, [userId, limit, offset]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = 'No candidates found!';
@@ -133,6 +115,7 @@ const searchCandidates = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
+    console.log(error);
     errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
@@ -156,4 +139,4 @@ const getCandidatesLength = async (req, res) => {
   }
 };
 
-export { getAll, getByID, searchCandidates, addCandidate, getCandidatesLength };
+export { getAll, getByID, addCandidate, getCandidatesLength };
