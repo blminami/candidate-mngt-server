@@ -1,9 +1,7 @@
 /* eslint-disable max-len */
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-import { errorMessage, status } from "../helpers/status";
-
-import env from "../../env";
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+import { errorMessage, status } from '../helpers/status';
 
 dotenv.config();
 
@@ -18,7 +16,7 @@ dotenv.config();
 const verifyToken = async (req, res, next) => {
   const { token } = req.headers;
   if (!token) {
-    errorMessage.error = "Token not provided";
+    errorMessage.error = 'Token not provided';
     return res.status(status.bad).send(errorMessage);
   }
   try {
@@ -26,13 +24,12 @@ const verifyToken = async (req, res, next) => {
     req.user = {
       email: decoded.email,
       user_id: decoded.user_id,
-      is_admin: decoded.is_admin,
       first_name: decoded.first_name,
       last_name: decoded.last_name,
     };
     next();
   } catch (error) {
-    errorMessage.error = "Authentication Failed";
+    errorMessage.error = 'Authentication Failed';
     return res.status(status.unauthorized).send(errorMessage);
   }
 };

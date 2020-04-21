@@ -1,7 +1,7 @@
 import express from 'express';
 import 'babel-polyfill';
 import bodyParser from 'body-parser';
-
+import cors from 'cors';
 import usersRoute from './routes/usersRoute';
 import seedRoute from './routes/seedRoute';
 import candidatesRoute from './routes/candidatesRoute';
@@ -25,6 +25,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(bodyParser.json());
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api', seedRoute);

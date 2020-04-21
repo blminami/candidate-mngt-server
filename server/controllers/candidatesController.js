@@ -23,7 +23,6 @@ const getByID = async (req, res) => {
 
 const addCandidate = async (req, res) => {
   const {
-    user_id,
     email,
     name,
     about,
@@ -33,6 +32,8 @@ const addCandidate = async (req, res) => {
     education,
     certifications,
   } = req.body;
+
+  const { user_id } = req.user;
 
   const skillData = '{' + skills.toLowerCase() + '}';
 
@@ -65,7 +66,6 @@ const addCandidate = async (req, res) => {
 
 const getAll = async (req, res) => {
   const {
-    userId,
     name,
     skills,
     yearsOfExperience,
@@ -74,6 +74,8 @@ const getAll = async (req, res) => {
     limit,
     offset,
   } = req.query;
+
+  const { user_id } = req.user;
 
   let searchQuery =
     'SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image FROM candidates WHERE user_id = $1 AND';
@@ -106,7 +108,7 @@ const getAll = async (req, res) => {
   }
   searchQuery = removeLastWord(searchQuery) + 'LIMIT $2 OFFSET $3;';
   try {
-    const { rows } = await dbQuery.query(searchQuery, [userId, limit, offset]);
+    const { rows } = await dbQuery.query(searchQuery, [user_id, limit, offset]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = 'No candidates found!';
@@ -122,10 +124,10 @@ const getAll = async (req, res) => {
 };
 
 const getCandidatesLength = async (req, res) => {
-  const userId = 1;
+  const { user_id } = req.user;
   const query = 'SELECT COUNT(*) FROM candidates WHERE user_id=$1;';
   try {
-    const { rows } = await dbQuery.query(query, [userId]);
+    const { rows } = await dbQuery.query(query, [user_id]);
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = 'No candidates found!';
@@ -134,6 +136,7 @@ const getCandidatesLength = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
+    console.log(error);
     errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
