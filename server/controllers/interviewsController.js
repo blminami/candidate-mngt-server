@@ -18,10 +18,10 @@ const addInterview = async (req, res) => {
   let statusData = '{}';
   let tagsData = '{}';
   if (interview_status) {
-    statusData = '{' + interview_status.toLowerCase() + '}';
+    statusData = '{' + interview_status + '}';
   }
   if (tags) {
-    tagsData = '{' + tags.toLowerCase() + '}';
+    tagsData = '{' + tags + '}';
   }
 
   const insertInterviewQuery = `INSERT INTO
@@ -52,16 +52,8 @@ const addInterview = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const {
-    user_id,
-    limit,
-    offset,
-    title,
-    interview_status,
-    tags,
-    by_date,
-  } = req.query;
-
+  const { user_id, limit, offset, title, interview_status, tags } = req.query;
+  let today = false;
   let getAllQuery = `SELECT * FROM interviews WHERE user_id = $1 AND`;
   if (title) {
     getAllQuery += " title LIKE '%" + title + "%' AND";
@@ -70,10 +62,16 @@ const getAll = async (req, res) => {
     let newStatus = interview_status
       .split(',')
       .map((el) => {
+        if (el === 'today') {
+          today = true;
+          return;
+        }
         return "'" + el.toLowerCase() + "'";
       })
       .join(',');
-    getAllQuery += ' status @> ARRAY[' + newStatus + '::text] AND';
+    if (newStatus != '') {
+      getAllQuery += ' status @> ARRAY[' + newStatus + '::text] AND';
+    }
   }
   if (tags) {
     let newTags = tags
@@ -84,10 +82,12 @@ const getAll = async (req, res) => {
       .join(',');
     getAllQuery += ' tags @> ARRAY[' + newTags + '::text] AND';
   }
-  if (by_date) {
+  if (today) {
     getAllQuery += ' DATE(start_date) = CURRENT_DATE AND';
   }
-  getAllQuery = removeLastWord(getAllQuery) + ' LIMIT $2 OFFSET $3;';
+  getAllQuery =
+    removeLastWord(getAllQuery) +
+    ' ORDER BY updated_at DESC LIMIT $2 OFFSET $3;';
 
   console.log('getALlQuery: ', getAllQuery);
   try {
@@ -95,7 +95,8 @@ const getAll = async (req, res) => {
     const dbResponse = rows;
     if (!dbResponse[0]) {
       errorMessage.error = 'No interviews found!';
-      return res.status(status.notfound).send(errorMessage);
+      errorMessage.data = [];
+      return res.status(status.success).send(errorMessage);
     }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
@@ -120,10 +121,10 @@ const updateInterview = async (req, res) => {
   let statusData = '{}';
   let tagsData = '{}';
   if (interview_status) {
-    statusData = '{' + interview_status.toLowerCase() + '}';
+    statusData = '{' + interview_status + '}';
   }
   if (tags) {
-    tagsData = '{' + tags.toLowerCase() + '}';
+    tagsData = '{' + tags + '}';
   }
 
   const updateInterviewQuery = `UPDATE interviews

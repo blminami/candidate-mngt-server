@@ -40,7 +40,8 @@ const getAll = async (req, res) => {
   const { user_id, project_name, project_status } = req.query;
   let getAllQuery = `SELECT * FROM jobs WHERE user_id = $1 AND`;
   if (project_name) {
-    getAllQuery += " title like '%" + project_name.toLowerCase() + "%' AND";
+    getAllQuery +=
+      " LOWER(title) like '%" + project_name.toLowerCase() + "%' AND";
   }
   if (project_status) {
     getAllQuery += ' (';
@@ -86,6 +87,29 @@ const getByID = async (req, res) => {
   }
 };
 
+const getAllByStatus = async (req, res) => {
+  const { user_id, project_status } = req.query;
+  const getQuery =
+    'SELECT * FROM JOBS WHERE user_id=$1 AND status LIKE ANY($2);';
+  try {
+    const { rows } = await dbQuery.query(getQuery, [
+      user_id,
+      '{' + project_status + '}',
+    ]);
+    const dbResponse = rows;
+    if (!dbResponse[0]) {
+      errorMessage.error = 'No jobs found!';
+      return res.status(status.notfound).send(errorMessage);
+    }
+    successMessage.data = dbResponse;
+    return res.status(status.success).send(successMessage);
+  } catch (error) {
+    console.log(error);
+    errorMessage.error = 'Operation was not successful';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
 const updateJob = async (req, res) => {
   const {
     id,
@@ -119,4 +143,4 @@ const updateJob = async (req, res) => {
   }
 };
 
-export { addJob, getAll, getByID, updateJob };
+export { addJob, getAll, getByID, updateJob, getAllByStatus };

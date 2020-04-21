@@ -4,6 +4,7 @@ import {
   getAll,
   getByID,
   updateJob,
+  getAllByStatus,
 } from '../controllers/jobsController';
 
 const router = express.Router();
@@ -11,6 +12,7 @@ const router = express.Router();
 // Interviews
 router.get('/', getAll);
 router.get('/:id', getByID);
+router.get('/filter/byStatus', getAllByStatus);
 router.post('/', addJob);
 router.put('/', updateJob);
 
