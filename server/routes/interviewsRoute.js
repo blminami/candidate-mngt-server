@@ -5,11 +5,13 @@ import {
   updateInterview,
 } from '../controllers/interviewsController';
 
+import verifyAuth from '../middlewares/verifyAuth';
+
 const router = express.Router();
 
 // Interviews
-router.get('/', getAll);
-router.post('/', addInterview);
-router.put('/', updateInterview);
+router.get('/', verifyAuth, getAll);
+router.post('/', verifyAuth, addInterview);
+router.put('/', verifyAuth, updateInterview);
 
 export default router;

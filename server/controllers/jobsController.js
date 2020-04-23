@@ -4,14 +4,13 @@ import { removeLastWord } from '../helpers/utils';
 
 const addJob = async (req, res) => {
   const {
-    user_id,
     title,
     description,
     job_status,
     required_resources,
     hired_resources,
   } = req.body;
-
+  const { user_id } = req.user;
   const insertJobQuery = `INSERT INTO
         jobs(id, user_id, title, description, status, required_resources, hired_resources)
         VALUES(default, $1, $2, $3, $4, $5, $6)
@@ -37,7 +36,8 @@ const addJob = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const { user_id, project_name, project_status } = req.query;
+  const { project_name, project_status } = req.query;
+  const { user_id } = req.user;
   let getAllQuery = `SELECT * FROM jobs WHERE user_id = $1 AND`;
   if (project_name) {
     getAllQuery +=
@@ -88,7 +88,8 @@ const getByID = async (req, res) => {
 };
 
 const getAllByStatus = async (req, res) => {
-  const { user_id, project_status } = req.query;
+  const { project_status } = req.query;
+  const { user_id } = req.user;
   const getQuery =
     'SELECT * FROM JOBS WHERE user_id=$1 AND status LIKE ANY($2);';
   try {

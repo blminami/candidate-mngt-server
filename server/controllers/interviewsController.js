@@ -4,16 +4,18 @@ import { removeLastWord } from '../helpers/utils';
 
 const addInterview = async (req, res) => {
   const {
-    user_id,
     candidate_id,
     title,
     notes,
     interview_status,
     tags,
     start_date,
+    start_time,
     due_date,
+    end_time,
     job_id,
   } = req.body;
+  const { user_id } = req.user;
 
   let statusData = '{}';
   let tagsData = '{}';
@@ -25,8 +27,8 @@ const addInterview = async (req, res) => {
   }
 
   const insertInterviewQuery = `INSERT INTO
-      interviews(id, user_id, candidate_id, title, notes, status, tags, start_date, due_date, job_id)
-      VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8, $9)
+      interviews(id, user_id, candidate_id, title, notes, status, tags, start_date, start_time, due_date, end_time, job_id)
+      VALUES(default, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
       returning *`;
   const values = [
     user_id,
@@ -36,7 +38,9 @@ const addInterview = async (req, res) => {
     statusData,
     tagsData,
     start_date,
+    start_time,
     due_date,
+    end_time,
     job_id,
   ];
   try {
@@ -52,7 +56,8 @@ const addInterview = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  const { user_id, limit, offset, title, interview_status, tags } = req.query;
+  const { limit, offset, title, interview_status, tags } = req.query;
+  const { user_id } = req.user;
   let today = false;
   let getAllQuery = `SELECT * FROM interviews WHERE user_id = $1 AND`;
   if (title) {
@@ -89,7 +94,6 @@ const getAll = async (req, res) => {
     removeLastWord(getAllQuery) +
     ' ORDER BY updated_at DESC LIMIT $2 OFFSET $3;';
 
-  console.log('getALlQuery: ', getAllQuery);
   try {
     const { rows } = await dbQuery.query(getAllQuery, [user_id, limit, offset]);
     const dbResponse = rows;
@@ -115,7 +119,9 @@ const updateInterview = async (req, res) => {
     interview_status,
     tags,
     start_date,
+    start_time,
     due_date,
+    end_time,
   } = req.body;
 
   let statusData = '{}';
@@ -128,9 +134,19 @@ const updateInterview = async (req, res) => {
   }
 
   const updateInterviewQuery = `UPDATE interviews
-    SET title=$2, notes=$3, status=$4, tags=$5, start_date=$6, due_date=$7
+    SET title=$2, notes=$3, status=$4, tags=$5, start_date=$6, due_date=$7, start_time=$8, end_time=$9
     WHERE id=$1 returning *`;
-  const values = [id, title, notes, statusData, tagsData, start_date, due_date];
+  const values = [
+    id,
+    title,
+    notes,
+    statusData,
+    tagsData,
+    start_date,
+    due_date,
+    start_time,
+    end_time,
+  ];
   try {
     const { rows } = await dbQuery.query(updateInterviewQuery, values);
     const dbResponse = rows[0];

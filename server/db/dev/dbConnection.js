@@ -92,7 +92,9 @@ const createInterviewsTable = () => {
       status TEXT ARRAY,
       tags TEXT ARRAY,
       start_date TIMESTAMPTZ NOT NULL,
+      start_time VARCHAR(100),
       due_date TIMESTAMPTZ NOT NULL,
+      end_time VARCHAR(100),
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 

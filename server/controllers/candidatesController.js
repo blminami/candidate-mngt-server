@@ -74,7 +74,6 @@ const getAll = async (req, res) => {
     limit,
     offset,
   } = req.query;
-
   const { user_id } = req.user;
 
   let searchQuery =
