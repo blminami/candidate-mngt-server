@@ -10,6 +10,7 @@ import candidatesRoute from './routes/candidatesRoute';
 import interviewsRoute from './routes/interviewsRoute';
 import jobsRoute from './routes/jobsRoute';
 import tagsRoute from './routes/tagsRoute';
+import eventsRoute from './routes/eventsRoute';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/candidates', candidatesRoute);
 app.use('/api/interviews', interviewsRoute);
 app.use('/api/jobs', jobsRoute);
 app.use('/api/tags', tagsRoute);
+app.use('/api/events', eventsRoute);
 
 app.use((err, req, res, next) => {
   console.warn(err);

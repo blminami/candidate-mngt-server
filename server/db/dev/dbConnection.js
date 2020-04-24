@@ -186,6 +186,47 @@ const createTagsTable = () => {
     });
 };
 
+const createEventsTable = () => {
+  const eventsCreateQuery = `
+    CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = NOW();
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+
+    CREATE TABLE IF NOT EXISTS events
+      (id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      title VARCHAR(100),
+      color VARCHAR(10),
+      start_date TIMESTAMPTZ NOT NULL,
+      start_time VARCHAR(100),
+      due_date TIMESTAMPTZ NOT NULL,
+      end_time VARCHAR(100),
+      location VARCHAR(100),
+      notes VARCHAR(500),
+      type VARCHAR(20),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+
+    CREATE TRIGGER set_timestamp
+    BEFORE UPDATE ON events
+    FOR EACH ROW
+    EXECUTE PROCEDURE trigger_set_timestamp();
+  `;
+  pool
+    .query(eventsCreateQuery)
+    .then((res) => {
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 const dropUserTable = () => {
   const usersDropQuery = 'DROP TABLE IF EXISTS users;';
   pool
@@ -256,6 +297,20 @@ const dropTagsTable = () => {
     });
 };
 
+const dropEventsTable = () => {
+  const eventsDropQuery = 'DROP TABLE IF EXISTS events;';
+  pool
+    .query(eventsDropQuery)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 /**
  * Create All Tables
  */
@@ -265,6 +320,7 @@ const createAllTables = () => {
   createInterviewsTable();
   createJobsTable();
   createTagsTable();
+  createEventsTable();
 };
 
 const dropAllTables = () => {
@@ -273,6 +329,7 @@ const dropAllTables = () => {
   dropInterviewsTable();
   dropJobsTable();
   dropTagsTable();
+  dropEventsTable();
 };
 
 pool.on('remove', () => {
