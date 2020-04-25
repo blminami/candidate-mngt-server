@@ -20,7 +20,7 @@ const addSubscription = async (req, res) => {
   const { endpoint, expirationTime, p256dh, auth } = req.body;
   const { user_id } = req.user;
   const insertQuery = `INSERT INTO subscriptions(id, user_id, endpoint, expirationtime, p256dh, auth)
-  VALUES (default, $1, $2, $3, $4, $5) RETURNING *;`;
+  VALUES (default, $1, $2, $3, $4, $5) ON CONFLICT (user_id) DO NOTHING RETURNING *;`;
   try {
     const { rows } = await dbQuery.query(insertQuery, [
       user_id,
