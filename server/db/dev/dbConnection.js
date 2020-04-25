@@ -227,6 +227,27 @@ const createEventsTable = () => {
     });
 };
 
+const createSubscriptionsTable = () => {
+  const subscriptionsCreateQuery = `
+    CREATE TABLE IF NOT EXISTS subscriptions
+      (id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      endpoint VARCHAR(500),
+      expirationTime VARCHAR(100),
+      p256dh VARCHAR(200),
+      auth VARCHAR(100));
+  `;
+  pool
+    .query(subscriptionsCreateQuery)
+    .then((res) => {
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 const dropUserTable = () => {
   const usersDropQuery = 'DROP TABLE IF EXISTS users;';
   pool
@@ -311,6 +332,20 @@ const dropEventsTable = () => {
     });
 };
 
+const dropSubscriptionsTable = () => {
+  const subscriptionsDropQuery = 'DROP TABLE IF EXISTS subscriptions;';
+  pool
+    .query(subscriptionsDropQuery)
+    .then((res) => {
+      console.log(res);
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 /**
  * Create All Tables
  */
@@ -321,6 +356,7 @@ const createAllTables = () => {
   createJobsTable();
   createTagsTable();
   createEventsTable();
+  createSubscriptionsTable();
 };
 
 const dropAllTables = () => {
@@ -330,6 +366,7 @@ const dropAllTables = () => {
   dropJobsTable();
   dropTagsTable();
   dropEventsTable();
+  dropSubscriptionsTable();
 };
 
 pool.on('remove', () => {
