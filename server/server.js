@@ -13,6 +13,8 @@ import tagsRoute from './routes/tagsRoute';
 import eventsRoute from './routes/eventsRoute';
 import subscriptionsRoute from './routes/subscriptionsRoute';
 
+import { watch } from './controllers/uploadsController';
+
 const app = express();
 
 app.use(function (req, res, next) {
@@ -50,3 +52,5 @@ app.use((err, req, res, next) => {
 app.listen(3000, function () {
   console.log('Listening on port 3000!');
 });
+
+watch();
