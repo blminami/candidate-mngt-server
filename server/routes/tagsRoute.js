@@ -5,7 +5,6 @@ import { getTags, addTag, deleteTag } from '../controllers/tagController';
 
 const router = express.Router();
 
-// Candidates
 router.get('/', verifyAuth, getTags);
 router.post('/', verifyAuth, addTag);
 router.delete('/:id', verifyAuth, deleteTag);

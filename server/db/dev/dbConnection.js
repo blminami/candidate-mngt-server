@@ -248,6 +248,27 @@ const createSubscriptionsTable = () => {
     });
 };
 
+const createUploadsTable = () => {
+  const uploadsCreateQuery = `
+    CREATE TABLE IF NOT EXISTS uploads
+      (id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      type VARCHAR(20),
+      name VARCHAR(100),
+      size VARCHAR(10),
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+  `;
+  pool
+    .query(uploadsCreateQuery)
+    .then((res) => {
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 const dropUserTable = () => {
   const usersDropQuery = 'DROP TABLE IF EXISTS users;';
   pool
@@ -357,6 +378,7 @@ const createAllTables = () => {
   createTagsTable();
   createEventsTable();
   createSubscriptionsTable();
+  createUploadsTable();
 };
 
 const dropAllTables = () => {

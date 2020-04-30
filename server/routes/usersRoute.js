@@ -9,7 +9,6 @@ import {
 const router = express.Router();
 
 // users Routes
-
 router.post('/auth/signup', createUser);
 router.post('/auth/signin', signinUser);
 router.get('/first_name', searchFirstnameOrLastname);

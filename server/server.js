@@ -12,6 +12,7 @@ import jobsRoute from './routes/jobsRoute';
 import tagsRoute from './routes/tagsRoute';
 import eventsRoute from './routes/eventsRoute';
 import subscriptionsRoute from './routes/subscriptionsRoute';
+import uploadsRoute from './routes/uploadsRoute';
 
 import { watch } from './controllers/uploadsController';
 
@@ -43,6 +44,7 @@ app.use('/api/jobs', jobsRoute);
 app.use('/api/tags', tagsRoute);
 app.use('/api/events', eventsRoute);
 app.use('/api/subscriptions', subscriptionsRoute);
+app.use('/api/uploads', uploadsRoute);
 
 app.use((err, req, res, next) => {
   console.warn(err);
