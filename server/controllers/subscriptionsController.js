@@ -38,7 +38,7 @@ const addSubscription = async (req, res) => {
   }
 };
 
-const sendNotifications = schedule.scheduleJob('*/1 * * * *', async () => {
+const sendNotifications = schedule.scheduleJob('*/30 * * * *', async () => {
   const getSubscriptionQuery = `select endpoint, s.user_id, expirationtime, p256dh, auth, title, start_time from subscriptions s
     JOIN events ev on s.user_id = ev.user_id
     JOIN users u on u.id = s.user_id

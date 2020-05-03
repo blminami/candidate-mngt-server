@@ -29,7 +29,6 @@ const addJob = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log('error', error);
     errorMessage.error = 'Unable to add job';
     return res.status(status.error).send(errorMessage);
   }
@@ -98,10 +97,6 @@ const getAllByStatus = async (req, res) => {
       '{' + project_status + '}',
     ]);
     const dbResponse = rows;
-    if (!dbResponse[0]) {
-      errorMessage.error = 'No jobs found!';
-      return res.status(status.notfound).send(errorMessage);
-    }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {

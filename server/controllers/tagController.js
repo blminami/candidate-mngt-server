@@ -8,11 +8,6 @@ const getTags = async (req, res) => {
   try {
     const { rows } = await dbQuery.query(getAllTagsQuery, [user_id]);
     const dbResponse = rows;
-    if (!dbResponse[0]) {
-      errorMessage.error = 'No tags found!';
-      errorMessage.data = [];
-      return res.status(status.success).send(errorMessage);
-    }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {

@@ -97,11 +97,6 @@ const getAll = async (req, res) => {
   try {
     const { rows } = await dbQuery.query(getAllQuery, [user_id, limit, offset]);
     const dbResponse = rows;
-    if (!dbResponse[0]) {
-      errorMessage.error = 'No interviews found!';
-      errorMessage.data = [];
-      return res.status(status.success).send(errorMessage);
-    }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {

@@ -110,7 +110,6 @@ const getAllEvents = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log('error', error);
     errorMessage.error = 'Unable to get events';
     return res.status(status.error).send(errorMessage);
   }

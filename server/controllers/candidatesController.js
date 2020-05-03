@@ -142,14 +142,9 @@ const getAll = async (req, res) => {
   try {
     const { rows } = await dbQuery.query(searchQuery, [user_id, limit, offset]);
     const dbResponse = rows;
-    if (!dbResponse[0]) {
-      errorMessage.error = 'No candidates found!';
-      return res.status(status.notfound).send(errorMessage);
-    }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    console.log(error);
     errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
@@ -161,10 +156,6 @@ const getCandidatesLength = async (req, res) => {
   try {
     const { rows } = await dbQuery.query(query, [user_id]);
     const dbResponse = rows;
-    if (!dbResponse[0]) {
-      errorMessage.error = 'No candidates found!';
-      return res.status(status.notfound).send(errorMessage);
-    }
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
