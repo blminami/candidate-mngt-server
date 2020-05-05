@@ -269,6 +269,28 @@ const createUploadsTable = () => {
     });
 };
 
+const createEmailsTable = () => {
+  const emailsCreateQuery = `
+    CREATE TABLE IF NOT EXISTS emails
+      (id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      email VARCHAR(100),
+      type VARCHAR(20),
+      subject VARCHAR(300),
+      message TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+  `;
+  pool
+    .query(emailsCreateQuery)
+    .then((res) => {
+      pool.end();
+    })
+    .catch((err) => {
+      console.log(err);
+      pool.end();
+    });
+};
+
 const dropUserTable = () => {
   const usersDropQuery = 'DROP TABLE IF EXISTS users;';
   pool
@@ -379,6 +401,7 @@ const createAllTables = () => {
   createEventsTable();
   createSubscriptionsTable();
   createUploadsTable();
+  createEmailsTable();
 };
 
 const dropAllTables = () => {
