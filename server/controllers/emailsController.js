@@ -1,5 +1,19 @@
 import dbQuery from '../db/dev/dbQuery';
 import { errorMessage, successMessage, status } from '../helpers/status';
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+var smtpTransport = nodemailer.createTransport({
+  service: process.env.MAILER_SERVICE_PROVIDER,
+  secure: false,
+  port: 587,
+  auth: {
+    user: process.env.MAILER_EMAIL_ID,
+    pass: process.env.MAILER_PASSWORD,
+  },
+});
 
 const addEmail = async (req, res) => {
   let { type, subject, message } = req.body;
@@ -73,4 +87,45 @@ const updateEmail = async (req, res) => {
   }
 };
 
-export { addEmail, getEmails, getEmailByID, updateEmail };
+const sendEmail = async (req, res) => {
+  const { candidate_id, email_type, project_id } = req.query;
+  const { user_id } = req.user;
+
+  const getCandidateQuery = `SELECT * FROM candidates WHERE id=$1;`;
+  const getEmailQuery = `SELECT * FROM emails WHERE user_id=$1 and type=$2;`;
+  const getProjectQuery = `SELECT * FROM jobs WHERE id=$1;`;
+
+  try {
+    const candidateRows = await dbQuery.query(getCandidateQuery, [
+      candidate_id,
+    ]);
+    const emailRows = await dbQuery.query(getEmailQuery, [user_id, email_type]);
+    const candidate = candidateRows.rows[0];
+    const email = emailRows.rows[0];
+
+    //TODO: Replace {{username}} in message body
+    var data = {
+      to: candidate.email,
+      from: email.email,
+      subject: email.subject,
+      html: email.message,
+    };
+
+    smtpTransport.sendMail(data, function (err) {
+      if (!err) {
+        successMessage.data = 'Email send successfully';
+        return res.status(status.created).send(successMessage);
+      } else {
+        console.log(err);
+        errorMessage.error = 'Unable to send email';
+        return res.status(status.error).send(errorMessage);
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    errorMessage.error = 'Unable to send email';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+export { addEmail, getEmails, getEmailByID, updateEmail, sendEmail };

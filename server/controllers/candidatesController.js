@@ -103,7 +103,6 @@ const getAll = async (req, res) => {
     offset,
   } = req.query;
   const { user_id } = req.user;
-  console.log(candidate_status);
   let searchQuery =
     'SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image, candidate_status FROM candidates WHERE user_id = $1 AND';
   if (name) {
@@ -138,7 +137,6 @@ const getAll = async (req, res) => {
   }
   searchQuery = removeLastWord(searchQuery) + ' LIMIT $2 OFFSET $3;';
 
-  console.log(searchQuery);
   try {
     const { rows } = await dbQuery.query(searchQuery, [user_id, limit, offset]);
     const dbResponse = rows;
@@ -159,7 +157,6 @@ const getCandidatesLength = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
   } catch (error) {
-    console.log(error);
     errorMessage.error = 'Operation was not successful';
     return res.status(status.error).send(errorMessage);
   }
