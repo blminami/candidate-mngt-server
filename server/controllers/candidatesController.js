@@ -92,6 +92,7 @@ const addCandidate = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
+  console.log('hello');
   const {
     name,
     skills,
@@ -139,6 +140,7 @@ const getAll = async (req, res) => {
 
   try {
     const { rows } = await dbQuery.query(searchQuery, [user_id, limit, offset]);
+    console.log(rows);
     const dbResponse = rows;
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);

@@ -27,7 +27,6 @@ const getResume = (value) => {
 };
 
 const getExperience = (value) => {
-  console.log('value: ', value);
   const years = value.join(' ').match(/\d{4}/g).filter(onlyUnique).sort();
   let yearsOfExperience = 0;
   if (years && years.length > 0) {
