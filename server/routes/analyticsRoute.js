@@ -8,6 +8,7 @@ import {
   getCandidatesByStatus,
   getJobs,
   getJobsByStatus,
+  getInterviewsPeriods,
 } from '../controllers/analyticsController';
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get('/hired-candidates', verifyAuth, getCountOfHiredCandidates);
 router.get('/candidates-by-status', verifyAuth, getCandidatesByStatus);
 router.get('/jobs', verifyAuth, getJobs);
 router.get('/jobs-by-status', verifyAuth, getJobsByStatus);
+router.get('/interviews/event-periods', verifyAuth, getInterviewsPeriods);
 
 export default router;

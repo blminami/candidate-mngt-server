@@ -3,7 +3,7 @@ import { errorMessage, successMessage, status } from '../helpers/status';
 
 const getCandidatesStatistic = async (req, res) => {
   const { user_id } = req.user;
-  const query = `SELECT date_part('year', created_at) as year, date_part('month', created_at) AS month, count(*)
+  const query = `SELECT date_part('year', created_at) as year, date_part('month', created_at)-1 AS month, count(*)
   FROM candidates
   WHERE candidate_status='HIRED' and user_id=$1
   GROUP BY year, month ORDER by year, month;`;
@@ -134,6 +134,27 @@ const getJobsByStatus = async (req, res) => {
   }
 };
 
+const getInterviewsPeriods = async (req, res) => {
+  const { user_id } = req.user;
+  const query = `select concat(start_time, '-', end_time) as event_period, count(*) from interviews
+  where user_id=$1
+  and start_time is not null
+  and end_time is not null
+  group by event_period
+  order by event_period
+  limit 5;`;
+  try {
+    const { rows } = await dbQuery.query(query, [user_id]);
+    const dbResponse = rows;
+    successMessage.data = dbResponse;
+    return res.status(status.created).send(successMessage);
+  } catch (error) {
+    console.log(error);
+    errorMessage.error = 'Unable to get interviews data';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
 export {
   getCandidatesStatistic,
   getCountOfInterviews,
@@ -142,4 +163,5 @@ export {
   getCandidatesByStatus,
   getJobs,
   getJobsByStatus,
+  getInterviewsPeriods,
 };
