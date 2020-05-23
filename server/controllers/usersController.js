@@ -1,4 +1,6 @@
 import dbQuery from '../db/dev/dbQuery';
+import multer from 'multer';
+import cloudinary from 'cloudinary';
 
 import {
   hashPassword,
@@ -13,6 +15,25 @@ import { errorMessage, successMessage, status } from '../helpers/status';
 import { forgotPasswordBody } from '../helpers/forgot-password-body';
 import { sendAppEmail } from './emailsController';
 import { resetPasswordBody } from '../helpers/reset-password.body';
+
+const storage = multer.diskStorage({
+  destination: function (req, file, callback) {
+    callback(null, './user_images');
+  },
+  filename: function (req, file, callback) {
+    const { user_id } = req.user;
+    const originalName = file.originalname.split('.')[0];
+    const format = file.originalname.split('.')[1];
+    callback(null, `${originalName}$${user_id}.${format}`);
+  },
+});
+const upload = multer({ storage: storage }).single('fileKey');
+
+cloudinary.v2.config({
+  cloud_name: `daptcduwi`,
+  api_key: '453818915463151',
+  api_secret: 'MriaXTOhmfKPY4eL4YCM55VcyW0',
+});
 
 const createUser = async (req, res) => {
   const { email, first_name, last_name, password } = req.body;
@@ -212,10 +233,84 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const updateUserInfo = async (req, res) => {
+  const { email, first_name, last_name, notifications } = req.body;
+  const { user_id } = req.user;
+  const query = `UPDATE users SET email=$1, first_name=$2, last_name=$3, notifications=$4 WHERE id=$5 RETURNING *;`;
+  try {
+    const { rows } = await dbQuery.query(query, [
+      email,
+      first_name,
+      last_name,
+      notifications,
+      user_id,
+    ]);
+    const dbResponse = rows[0];
+    delete dbResponse.password;
+    const token = generateUserToken(
+      dbResponse.email,
+      dbResponse.id,
+      dbResponse.first_name,
+      dbResponse.last_name
+    );
+    successMessage.data = dbResponse;
+    successMessage.data.token = token;
+    return res.status(status.created).send(successMessage);
+  } catch (error) {
+    errorMessage.error = 'Operation was not successful';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+const uploadProfileImage = async (req, res) => {
+  const { user_id } = req.user;
+  upload(req, res, async function (err) {
+    if (err) {
+      return res.status(status.error).send('Error uploading file');
+    }
+    const originalName = req.file.originalname.split('.')[0];
+    const format = req.file.originalname.split('.')[1];
+    cloudinary.v2.uploader.upload(
+      `user_images/${originalName}$${user_id}.${format}`,
+      async function (error, result) {
+        console.log(result, error);
+        if (error) {
+          errorMessage.error = 'Unable to add profile image';
+          return res.status(status.error).send(errorMessage);
+        }
+        const query =
+          'UPDATE users SET profile_image=$1 WHERE id=$2 RETURNING *;';
+        try {
+          const { rows } = await dbQuery.query(query, [
+            result.secure_url,
+            user_id,
+          ]);
+          const dbResponse = rows[0];
+          delete dbResponse.password;
+          const token = generateUserToken(
+            dbResponse.email,
+            dbResponse.id,
+            dbResponse.first_name,
+            dbResponse.last_name
+          );
+          successMessage.data = dbResponse;
+          successMessage.data.token = token;
+          return res.status(status.created).send(successMessage);
+        } catch (error) {
+          errorMessage.error = 'Unable to add profile image';
+          return res.status(status.error).send(errorMessage);
+        }
+      }
+    );
+  });
+};
+
 export {
   searchFirstnameOrLastname,
   signinUser,
   createUser,
   forgotPassword,
   resetPassword,
+  updateUserInfo,
+  uploadProfileImage,
 };

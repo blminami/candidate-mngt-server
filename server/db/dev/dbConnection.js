@@ -12,7 +12,6 @@ const createUserTable = () => {
     last_name VARCHAR(100),
     password VARCHAR(100) NOT NULL,
     created_on DATE NOT NULL)`;
-
   pool
     .query(userCreateQuery)
     .then((res) => {
