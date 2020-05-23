@@ -4,6 +4,8 @@ import {
   searchFirstnameOrLastname,
   createUser,
   signinUser,
+  forgotPassword,
+  resetPassword,
 } from '../controllers/usersController';
 
 const router = express.Router();
@@ -11,6 +13,8 @@ const router = express.Router();
 // users Routes
 router.post('/auth/signup', createUser);
 router.post('/auth/signin', signinUser);
+router.post('/auth/forgot-password', forgotPassword);
+router.post('/auth/reset-password', resetPassword);
 router.get('/first_name', searchFirstnameOrLastname);
 
 export default router;

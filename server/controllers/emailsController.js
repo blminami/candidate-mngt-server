@@ -128,4 +128,29 @@ const sendEmail = async (req, res) => {
   }
 };
 
-export { addEmail, getEmails, getEmailByID, updateEmail, sendEmail };
+const sendAppEmail = (email, subject, body) => {
+  var data = {
+    to: email,
+    from: 'minca.narcisa@gmail.com',
+    subject: subject,
+    html: body,
+  };
+  smtpTransport.sendMail(data, function (err) {
+    if (!err) {
+      return null;
+    } else {
+      console.log(err);
+      errorMessage.error = 'Unable to send email';
+      return errorMessage;
+    }
+  });
+};
+
+export {
+  addEmail,
+  getEmails,
+  getEmailByID,
+  updateEmail,
+  sendEmail,
+  sendAppEmail,
+};

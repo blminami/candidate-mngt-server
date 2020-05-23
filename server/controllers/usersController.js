@@ -10,6 +10,9 @@ import {
 } from '../helpers/validations';
 
 import { errorMessage, successMessage, status } from '../helpers/status';
+import { forgotPasswordBody } from '../helpers/forgot-password-body';
+import { sendAppEmail } from './emailsController';
+import { resetPasswordBody } from '../helpers/reset-password.body';
 
 const createUser = async (req, res) => {
   const { email, first_name, last_name, password } = req.body;
@@ -120,4 +123,99 @@ const searchFirstnameOrLastname = async (req, res) => {
   }
 };
 
-export { searchFirstnameOrLastname, signinUser, createUser };
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (isEmpty(email)) {
+    errorMessage.error = 'Email sdetail is missing';
+    return res.status(status.bad).send(errorMessage);
+  }
+  if (!isValidEmail(email)) {
+    errorMessage.error = 'Please enter a valid Email';
+    return res.status(status.bad).send(errorMessage);
+  }
+  const userQuery = 'SELECT * FROM users WHERE email = $1';
+  try {
+    const { rows } = await dbQuery.query(userQuery, [email]);
+    const dbResponse = rows[0];
+    if (!dbResponse) {
+      errorMessage.error = 'User with this email does not exist';
+      return res.status(status.notfound).send(errorMessage);
+    }
+    let emailBody = forgotPasswordBody;
+    emailBody = emailBody
+      .replace('{{firstName}}', dbResponse.first_name)
+      .replace('{{lastName}}', dbResponse.last_name)
+      .replace(/{{url}}/g, 'http://localhost:4200/auth/reset-password');
+    const err = sendAppEmail(email, 'Forgot Password Email', emailBody);
+    if (err) {
+      errorMessage.error = 'Operation was not successful';
+      return res.status(status.error).send(errorMessage);
+    } else {
+      successMessage.data = 'Email send successfully';
+      return res.status(status.success).send(successMessage);
+    }
+  } catch (error) {
+    errorMessage.error = 'Operation was not successful';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+const resetPassword = async (req, res) => {
+  const { email, newPassword, confirmPassword } = req.body;
+  if (isEmpty(newPassword) || isEmpty(confirmPassword)) {
+    errorMessage.error = 'Password detail is missing';
+    return res.status(status.bad).send(errorMessage);
+  }
+  if (!validatePassword(newPassword) || !validatePassword(confirmPassword)) {
+    errorMessage.error = 'Please enter a valid Password';
+    return res.status(status.bad).send(errorMessage);
+  }
+  if (newPassword !== confirmPassword) {
+    errorMessage.error = "The Passwords don't match";
+    return res.status(status.bad).send(errorMessage);
+  }
+  const userQuery = 'SELECT * FROM users WHERE email = $1';
+  const updateQuery = 'UPDATE users SET password=$1 WHERE email=$2 RETURNING *';
+  try {
+    const { rows } = await dbQuery.query(userQuery, [email]);
+    if (!rows[0]) {
+      errorMessage.error = 'User with this email does not exist';
+      return res.status(status.notfound).send(errorMessage);
+    }
+    const hashedPassword = hashPassword(newPassword);
+    const updateRows = await dbQuery.query(updateQuery, [
+      hashedPassword,
+      email,
+    ]);
+    const dbResponse = updateRows.rows[0];
+    if (!dbResponse) {
+      errorMessage.error = "Error updating user's password";
+      return res.status(status.error).send(errorMessage);
+    }
+
+    let emailBody = resetPasswordBody;
+    emailBody = emailBody
+      .replace('{{firstName}}', dbResponse.first_name)
+      .replace('{{lastName}}', dbResponse.last_name)
+      .replace('{{email}}', dbResponse.email);
+    const err = sendAppEmail(email, 'Reset Password Email', emailBody);
+    if (err) {
+      errorMessage.error = 'Operation was not successful';
+      return res.status(status.error).send(errorMessage);
+    } else {
+      successMessage.data = 'Email send successfully';
+      return res.status(status.success).send(successMessage);
+    }
+  } catch (error) {
+    errorMessage.error = 'Operation was not successful';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+export {
+  searchFirstnameOrLastname,
+  signinUser,
+  createUser,
+  forgotPassword,
+  resetPassword,
+};
