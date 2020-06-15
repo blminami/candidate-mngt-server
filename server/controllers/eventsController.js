@@ -95,7 +95,6 @@ const deleteEvent = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log('error', error);
     errorMessage.error = 'Unable to delete event';
     return res.status(status.error).send(errorMessage);
   }
@@ -115,4 +114,18 @@ const getAllEvents = async (req, res) => {
   }
 };
 
-export { addEvent, updateEvent, deleteEvent, getAllEvents };
+const getEventsByCurrentDate = async (req, res) => {
+  const { user_id } = req.user;
+  const getAllQuery = `SELECT * FROM events WHERE user_id=$1 and DATE(start_date) = CURRENT_DATE;`;
+  try {
+    const { rows } = await dbQuery.query(getAllQuery, [user_id]);
+    const dbResponse = rows;
+    successMessage.data = dbResponse;
+    return res.status(status.created).send(successMessage);
+  } catch (error) {
+    errorMessage.error = 'Unable to get events';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+export { addEvent, updateEvent, deleteEvent, getAllEvents, getEventsByCurrentDate};
