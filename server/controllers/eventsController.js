@@ -19,6 +19,18 @@ const addEvent = async (req, res) => {
   if (!color) {
     color = '#ea80fc';
   }
+
+  const newStartDate = new Date(start_date);
+  if (start_time) {
+    newStartDate.setHours(start_time.split(':')[0]);
+    newStartDate.setMinutes(start_time.split(':')[1]);
+  }
+  const newEndDate = new Date(due_date);
+  if (end_time) {
+    newEndDate.setHours(end_time.split(':')[0]);
+    newEndDate.setMinutes(end_time.split(':')[1]);
+  }
+
   const { user_id } = req.user;
   const insertEventQuery = `INSERT INTO
           events(id, user_id, title, color, start_date, start_time, due_date, end_time, location, notes, type)
@@ -28,9 +40,9 @@ const addEvent = async (req, res) => {
     user_id,
     title,
     color,
-    start_date,
+    newStartDate,
     start_time,
-    due_date,
+    newEndDate,
     end_time,
     location,
     notes,
@@ -42,7 +54,6 @@ const addEvent = async (req, res) => {
     successMessage.data = dbResponse;
     return res.status(status.created).send(successMessage);
   } catch (error) {
-    console.log('error', error);
     errorMessage.error = 'Unable to add event';
     return res.status(status.error).send(errorMessage);
   }
@@ -60,6 +71,18 @@ const updateEvent = async (req, res) => {
     location,
     notes,
   } = req.body;
+
+  const newStartDate = new Date(start_date);
+  if (start_time) {
+    newStartDate.setHours(start_time.split(':')[0]);
+    newStartDate.setMinutes(start_time.split(':')[1]);
+  }
+  const newEndDate = new Date(due_date);
+  if (end_time) {
+    newEndDate.setHours(end_time.split(':')[0]);
+    newEndDate.setMinutes(end_time.split(':')[1]);
+  }
+
   const updateEventsQuery = `UPDATE events
       SET title=$2, color=$3, start_date=$4, start_time=$5, due_date=$6, end_time=$7, location=$8, notes=$9
       WHERE id=$1 returning *`;
@@ -67,13 +90,14 @@ const updateEvent = async (req, res) => {
     id,
     title,
     color,
-    start_date,
+    newStartDate,
     start_time,
-    due_date,
+    newEndDate,
     end_time,
     location,
     notes,
   ];
+
   try {
     const { rows } = await dbQuery.query(updateEventsQuery, values);
     const dbResponse = rows[0];
@@ -128,4 +152,10 @@ const getEventsByCurrentDate = async (req, res) => {
   }
 };
 
-export { addEvent, updateEvent, deleteEvent, getAllEvents, getEventsByCurrentDate};
+export {
+  addEvent,
+  updateEvent,
+  deleteEvent,
+  getAllEvents,
+  getEventsByCurrentDate,
+};
