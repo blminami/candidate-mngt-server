@@ -92,7 +92,6 @@ const addCandidate = async (req, res) => {
 };
 
 const getAll = async (req, res) => {
-  console.log('hello');
   const {
     name,
     skills,
@@ -100,6 +99,7 @@ const getAll = async (req, res) => {
     yearsOfExperience,
     keyWords,
     sections,
+    projectId,
     limit,
     offset,
   } = req.query;
@@ -107,7 +107,10 @@ const getAll = async (req, res) => {
   let searchQuery =
     'SELECT id, email, name, about, experience, years_of_experience, skills, education, certifications, profile_image, candidate_status FROM candidates WHERE user_id = $1 AND';
   if (name) {
-    searchQuery += " name LIKE '%" + name + "%' AND";
+    searchQuery += " lower(name) LIKE lower('%" + name + "%') AND";
+  }
+  if (projectId && projectId !== '0') {
+    searchQuery += ' project_id = ' + projectId + ' AND';
   }
   if (skills) {
     let newSkills = skills
@@ -140,7 +143,6 @@ const getAll = async (req, res) => {
 
   try {
     const { rows } = await dbQuery.query(searchQuery, [user_id, limit, offset]);
-    console.log(rows);
     const dbResponse = rows;
     successMessage.data = dbResponse;
     return res.status(status.success).send(successMessage);
@@ -204,4 +206,31 @@ const updateCandidate = async (req, res) => {
   }
 };
 
-export { getAll, getByID, addCandidate, getCandidatesLength, updateCandidate };
+const updateCandidateStatus = async (req, res) => {
+  const { candidateId, projectId } = req.body;
+  console.log('Method updateCandidateStatus: ', candidateId, projectId);
+  const query = `UPDATE candidates SET candidate_status=$1, project_id=$2 WHERE id=$3 returning *;`;
+  try {
+    const { rows } = await dbQuery.query(query, [
+      'CONTACTED',
+      projectId,
+      candidateId,
+    ]);
+    const dbResponse = rows[0];
+    successMessage.data = dbResponse;
+    return res.status(status.created).send(successMessage);
+  } catch (error) {
+    console.log('\nerror: ', error);
+    errorMessage.error = 'Unable to update candidate';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+export {
+  getAll,
+  getByID,
+  addCandidate,
+  getCandidatesLength,
+  updateCandidate,
+  updateCandidateStatus,
+};

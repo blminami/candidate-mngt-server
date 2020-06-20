@@ -88,12 +88,17 @@ const updateEmail = async (req, res) => {
 };
 
 const sendEmail = async (req, res) => {
-  const { candidate_id, email_type, project_id } = req.query;
+  const {
+    candidate_id,
+    email_type,
+    start_date,
+    start_time,
+    project,
+  } = req.query;
   const { user_id } = req.user;
 
   const getCandidateQuery = `SELECT * FROM candidates WHERE id=$1;`;
   const getEmailQuery = `SELECT * FROM emails WHERE user_id=$1 and type=$2;`;
-  const getProjectQuery = `SELECT * FROM jobs WHERE id=$1;`;
 
   try {
     const candidateRows = await dbQuery.query(getCandidateQuery, [
@@ -102,8 +107,18 @@ const sendEmail = async (req, res) => {
     const emailRows = await dbQuery.query(getEmailQuery, [user_id, email_type]);
     const candidate = candidateRows.rows[0];
     const email = emailRows.rows[0];
+    email.message = email.message.replace(/candidate_name/g, candidate.name);
 
-    //TODO: Replace {{username}} in message body
+    if (start_date) {
+      email.message = email.message.replace(/start_date/g, start_date);
+    }
+    if (start_time) {
+      email.message = email.message.replace(/start_time/g, start_time);
+    }
+    if (project) {
+      email.message = email.message.replace(/project_name/g, project);
+    }
+
     var data = {
       to: candidate.email,
       from: email.email,

@@ -154,4 +154,20 @@ const updateInterview = async (req, res) => {
   }
 };
 
-export { addInterview, getAll, updateInterview };
+const getInterviewsByCandidate = async (req, res) => {
+  const { candidateId } = req.query;
+  const { user_id } = req.user;
+  const query = `SELECT start_date, start_time FROM interviews WHERE user_id = $1 AND candidate_id = $2;`;
+  try {
+    const { rows } = await dbQuery.query(query, [user_id, candidateId]);
+    const dbResponse = rows;
+    successMessage.data = dbResponse;
+    return res.status(status.success).send(successMessage);
+  } catch (error) {
+    console.log(error);
+    errorMessage.error = 'Operation was not successful';
+    return res.status(status.error).send(errorMessage);
+  }
+};
+
+export { addInterview, getAll, updateInterview, getInterviewsByCandidate };
