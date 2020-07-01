@@ -3,7 +3,7 @@ import { errorMessage, successMessage, status } from '../helpers/status';
 
 const getCandidatesStatistic = async (req, res) => {
   const { user_id } = req.user;
-  const query = `SELECT date_part('year', created_at) as year, date_part('month', created_at)-1 AS month, count(*)
+  const query = `SELECT date_part('year', updated_at) as year, date_part('month', updated_at)-1 AS month, count(*)
   FROM candidates
   WHERE candidate_status='HIRED' and user_id=$1
   GROUP BY year, month ORDER by year, month;`;
@@ -75,7 +75,7 @@ const getCountOfHiredCandidates = async (req, res) => {
   const { user_id } = req.user;
   const { month } = req.query;
   const query = `select count(*) from candidates where candidate_status = 'HIRED'
-    and date_part('month', created_at)=$1 and user_id=$2;`;
+    and date_part('month', updated_at)=$1 and user_id=$2;`;
   try {
     const { rows } = await dbQuery.query(query, [month, user_id]);
     const dbResponse = rows;

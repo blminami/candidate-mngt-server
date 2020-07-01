@@ -18,6 +18,9 @@ _api/route-name_ -> all routes prefixed with `api`
 res.sendFile(path.join(\_\_dirname, '../client/dist/index.html'));
 });** -> to be inserted after all routes
 
+ npm install --save-dev @babel/core @babel/node
+ npm install --save babel-polyfill
+
 npm run setup
 
 TODO:
