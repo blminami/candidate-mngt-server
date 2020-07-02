@@ -38,11 +38,11 @@ const addSubscription = async (req, res) => {
   }
 };
 
-const sendNotifications = schedule.scheduleJob('*/30 * * * *', async () => {
+const sendNotifications = schedule.scheduleJob('*/1 * * * *', async () => {
   const getSubscriptionQuery = `select endpoint, s.user_id, expirationtime, p256dh, auth, title, start_time from subscriptions s
     JOIN events ev on s.user_id = ev.user_id
     JOIN users u on u.id = s.user_id
-    where ev.start_date = CURRENT_DATE and
+    where ev.start_date::date = CURRENT_DATE::date and
     DATE_PART('minute',TO_TIMESTAMP(ev.start_time, 'HH24:MI')::TIME - TO_TIMESTAMP(to_char(now(),'HH24:MI'), 'HH24:MI')::TIME) BETWEEN 1 AND 60 and
     notifications = TRUE;`;
   try {
