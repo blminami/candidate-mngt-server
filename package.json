@@ -12,7 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@babel/polyfill": "^7.8.7",
-    "babel-node": "0.0.1-security",
+    "babel-preset-env": "^1.7.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "cloudinary": "^1.21.0",
@@ -35,11 +35,9 @@
     "web-push": "^3.4.3"
   },
   "devDependencies": {
-    "babel-cli": "^7.0.0-alpha.12",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-preset-env": "^2.0.0-alpha.6",
-    "babel-preset-es2015": "^7.0.0-alpha.19",
-    "babel-register": "^7.0.0-alpha.2",
-    "babel-watch": "^7.0.0"
+    "@babel/cli": "^7.23.0",
+    "@babel/core": "^7.23.0",
+    "@babel/node": "^7.22.0",
+    "@babel/preset-env": "^7.23.0"
   }
 }
